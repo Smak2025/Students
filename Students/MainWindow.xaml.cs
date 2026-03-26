@@ -22,5 +22,10 @@ namespace Students
             InitializeComponent();
             DataContext = viewModel;
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            viewModel.SaveOnExit();
+        }
     }
 }

@@ -27,6 +27,8 @@ namespace Students
         private RelayCommand expelButtonPress;
         private RelayCommand saveButtonPress;
 
+        private bool changed;
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public RelayCommand AddButtonPress => addButtonPress;
@@ -69,25 +71,39 @@ namespace Students
             var stud = new Student();
             students.Add(stud);
             SelectedStudent = stud;
+            changed = true;
         }
 
         private void ExpelStudent(object? param)
         {
             students.Remove(SelectedStudent);
             SelectedStudent = null;
+            changed = true;
         }
 
         private void SaveAll(object? param)
         {
-            using (FileStream fs = new FileStream("students.json", FileMode.OpenOrCreate))
+            using (FileStream fs = new FileStream("students.json", FileMode.Create))
             {
                 JsonSerializer.Serialize(fs, students);
+                changed = false;
             }
         }
 
         private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void SaveOnExit()
+        {
+            if (changed)
+            {
+                if (MessageBox.Show("Сохранить изменения в файле?", "Внимание!", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    SaveAll(null);
+                }
+            }
         }
     }
 }
