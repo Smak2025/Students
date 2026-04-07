@@ -6,7 +6,16 @@ namespace Students
 {
     public class Student
     {
-        public int Id { get; set; }
+        private static int maxId = 0;
+        public int Id
+        {
+            get => field;
+            set
+            {
+                field = value;
+                maxId = Math.Max(maxId, value);
+            }
+        }
         public string LastName { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string Group { get; set; } = string.Empty;
@@ -14,9 +23,15 @@ namespace Students
         public string Level {  get; set; } = "Бакалавр";
         public string Speciality { get; set; } = "Математика и компьютерные науки";
 
+        public Student() { }
         public override string ToString()
         {
             return $"{Id}: {LastName} {FirstName}";
+        }
+
+        public void GenerateId()
+        {
+            Id = maxId + 1;
         }
     }
 }

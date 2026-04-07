@@ -52,23 +52,26 @@ namespace Students
             addButtonPress = new RelayCommand(AddNewStudent);
             expelButtonPress = new RelayCommand(ExpelStudent, (p) => { return SelectedStudent != null; });
             saveButtonPress = new RelayCommand(SaveAll);
-
-            using (FileStream fs = new FileStream("students.json", FileMode.Open))
+            try
             {
-                var stds = JsonSerializer.Deserialize<List<Student>>(fs);
-                foreach (var s in stds)
+                using (FileStream fs = new FileStream("students.json", FileMode.Open))
                 {
-                    students.Add(s);
+                    var stds = JsonSerializer.Deserialize<List<Student>>(fs);
+                    foreach (var s in stds)
+                    {
+                        students.Add(s);
+                    }
                 }
+
+                SelectedStudent = Students[0];
             }
-
-            SelectedStudent = Students[0];
-
+            catch { }
         }
 
         private void AddNewStudent(object? param)
         {
             var stud = new Student();
+            stud.GenerateId();
             students.Add(stud);
             SelectedStudent = stud;
             changed = true;

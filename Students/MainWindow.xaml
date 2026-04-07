@@ -48,7 +48,7 @@
 		</GroupBox>
 		<StackPanel DataContext="{Binding SelectedStudent}" Grid.Row="0" Grid.Column="1" Orientation="Vertical">
 			<TextBlock Text="Id:"/>
-			<TextBox Text="{Binding Id}"/>
+			<TextBox Text="{Binding Id}" IsReadOnly="True"/>
 		</StackPanel>
 		<StackPanel DataContext="{Binding SelectedStudent}" Grid.Row="1" Grid.Column="1" Orientation="Vertical">
 			<TextBlock Text="Фамилия:"/>
