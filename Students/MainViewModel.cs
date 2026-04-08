@@ -52,20 +52,20 @@ namespace Students
             addButtonPress = new RelayCommand(AddNewStudent);
             expelButtonPress = new RelayCommand(ExpelStudent, (p) => { return SelectedStudent != null; });
             saveButtonPress = new RelayCommand(SaveAll);
-            try
-            {
-                using (FileStream fs = new FileStream("students.json", FileMode.Open))
-                {
-                    var stds = JsonSerializer.Deserialize<List<Student>>(fs);
-                    foreach (var s in stds)
-                    {
-                        students.Add(s);
-                    }
-                }
+            //try
+            //{
+            //    using (FileStream fs = new FileStream("students.json", FileMode.Open))
+            //    {
+            //        var stds = JsonSerializer.Deserialize<List<Student>>(fs);
+            //        foreach (var s in stds)
+            //        {
+            //            students.Add(s);
+            //        }
+            //    }
 
-                SelectedStudent = Students[0];
-            }
-            catch { }
+            //    SelectedStudent = Students[0];
+            //}
+            //catch { }
         }
 
         private void AddNewStudent(object? param)
@@ -86,11 +86,11 @@ namespace Students
 
         private void SaveAll(object? param)
         {
-            using (FileStream fs = new FileStream("students.json", FileMode.Create))
-            {
-                JsonSerializer.Serialize(fs, students);
-                changed = false;
-            }
+            //using (FileStream fs = new FileStream("students.json", FileMode.Create))
+            //{
+            //    JsonSerializer.Serialize(fs, students);
+            //    changed = false;
+            //}
         }
 
         private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
