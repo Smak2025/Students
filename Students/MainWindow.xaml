@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
 		Closing="Window_Closing"
+		Loaded="Window_Loaded"
 		>
 	<Window.Resources>
 		<Style TargetType="TextBox">
@@ -78,7 +79,7 @@
 			<StackPanel Orientation="Horizontal">
 				<Button Content="Принять студента" Padding="8, 4"  Command="{Binding AddButtonPress}"/>
 				<Button Content="Отчислить студента" Padding="8, 4" Command="{Binding ExpelButtonPress}"/>
-				<Button Content="Сохранить всё" Padding="8, 4" Command="{Binding SaveButtonPress}"/>
+				<Button Content="Сохранить" Padding="8, 4" Command="{Binding SaveButtonPress}"/>
 			</StackPanel>
 		</StackPanel>
 	</Grid>

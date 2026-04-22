@@ -6,8 +6,8 @@ namespace Students
 {
     public class Student
     {
-        private static int maxId = 0;
-        public int Id
+        private static long maxId = 0L;
+        public long Id
         {
             get => field;
             set

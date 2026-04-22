@@ -51,21 +51,17 @@ namespace Students
         {
             addButtonPress = new RelayCommand(AddNewStudent);
             expelButtonPress = new RelayCommand(ExpelStudent, (p) => { return SelectedStudent != null; });
-            saveButtonPress = new RelayCommand(SaveAll);
-            //try
-            //{
-            //    using (FileStream fs = new FileStream("students.json", FileMode.Open))
-            //    {
-            //        var stds = JsonSerializer.Deserialize<List<Student>>(fs);
-            //        foreach (var s in stds)
-            //        {
-            //            students.Add(s);
-            //        }
-            //    }
+            saveButtonPress = new RelayCommand(async (obj) => { await Save(obj); });
+        }
 
-            //    SelectedStudent = Students[0];
-            //}
-            //catch { }
+        public async Task LoadData()
+        {
+            var stds = await DbHelper.LoadStudentsAsync();
+            Students.Clear();
+            foreach (var student in stds)
+            {
+                Students.Add(student);
+            }
         }
 
         private void AddNewStudent(object? param)
@@ -77,20 +73,20 @@ namespace Students
             changed = true;
         }
 
-        private void ExpelStudent(object? param)
+        private async void ExpelStudent(object? param)
         {
-            students.Remove(SelectedStudent);
-            SelectedStudent = null;
-            changed = true;
+            if (SelectedStudent != null)
+            {
+                await DbHelper.DeleteStudentInfoAsync(SelectedStudent);
+                students.Remove(SelectedStudent);
+                changed = true;
+            }
         }
 
-        private void SaveAll(object? param)
+        private async Task Save(object? param)
         {
-            //using (FileStream fs = new FileStream("students.json", FileMode.Create))
-            //{
-            //    JsonSerializer.Serialize(fs, students);
-            //    changed = false;
-            //}
+            if (SelectedStudent != null)
+                await DbHelper.SaveStudentAsync(SelectedStudent);
         }
 
         private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -104,7 +100,7 @@ namespace Students
             {
                 if (MessageBox.Show("Сохранить изменения в файле?", "Внимание!", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    SaveAll(null);
+                    Save(null);
                 }
             }
         }

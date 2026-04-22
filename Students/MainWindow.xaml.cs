@@ -27,5 +27,10 @@ namespace Students
         {
             viewModel.SaveOnExit();
         }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            await viewModel.LoadData();
+        }
     }
 }
