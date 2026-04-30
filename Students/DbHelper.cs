@@ -99,5 +99,73 @@ namespace Students
             cmd.Parameters.AddWithValue("@id", student.Id);
             await cmd.ExecuteNonQueryAsync();
         }
+
+        public static async Task SavePerformanceAsync(Performance performance)
+        {
+            var query = @"
+                INSERT INTO performance (student_id, subject, popints)
+                VALUES (@studentId, @subject, @points)
+                ON CONFLICT (student_id, subject)
+                DO UPDATE SET points = @points";
+            await using var conn = new NpgsqlConnection(connString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@studentId", performance.StudentId);
+            cmd.Parameters.AddWithValue("@subject", performance.Subject);
+            cmd.Parameters.AddWithValue("@points", performance.Points);
+
+            await cmd.ExecuteNonQueryAsync();
+        }
+
+        public static async Task DeletePerformanceAsync(long performanceId)
+        {
+            var query = "DELETE FROM performance WHERE id = @id";
+            await using var conn = new NpgsqlConnection(connString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@id", performanceId);
+            await cmd.ExecuteNonQueryAsync();
+        }
+
+        public static async Task<List<StudentsPerformance>> LoadPerformanceForStudentAsync(long studentId)
+        {
+            var query = @"
+                SELECT
+                    p.id as performance_id,
+                    p.student_id,
+                    s.lastname,
+                    s.firsname,
+                    p.subject,
+                    p.points
+                FROM performance p
+                INNER JOIN student s
+                ON p.student_id = s.id
+                WHERE p.student_id = @studentId
+                ORDER BY p.points
+            ";
+            await using var conn = new NpgsqlConnection(connString);
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@studentId", studentId);
+
+            await using var reader = await cmd.ExecuteReaderAsync();
+            var results = new List<StudentsPerformance>();
+
+            while(await reader.ReadAsync())
+            {
+                results.Add(new StudentsPerformance
+                {
+                    PerformanceId = reader.GetInt64(0),
+                    StudentId = reader.GetInt64(1),
+                    LastName = reader.GetString(2),
+                    FirstName = reader.GetString(3),
+                    Subject = reader.GetString(4),
+                    Points = reader.GetInt32(5)
+                });
+            }
+
+            return results;
+        }
+        
     }
 }

@@ -7,51 +7,85 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Students
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        ObservableCollection<Student> students = new ObservableCollection<Student>();
-        //[
-        //    new Student(){Id = 1, LastName="Иванов", FirstName="Иван", Group="05-401"},
-        //    new Student(){Id = 2, LastName="Петров", FirstName="Петр", Group="05-401"},
-        //    new Student(){Id = 3, LastName="Морозова", FirstName="Ксения", Group="05-401"},
-        //    new Student(){Id = 4, LastName="Полякова", FirstName="Ирина", Group="05-402"},
-        //    new Student(){Id = 5, LastName="Хабибуллин", FirstName="Руслан", Group="05-402"},
-        //];
+        ObservableCollection<Student> _students = new ObservableCollection<Student>();
+        public ObservableCollection<Student> Students => _students;
 
-        public ObservableCollection<Student> Students => students;
+        ObservableCollection<StudentsPerformance> _performances = new ObservableCollection<StudentsPerformance>();
+        public ObservableCollection<StudentsPerformance> Performances => _performances;
 
-        private RelayCommand addButtonPress;
-        private RelayCommand expelButtonPress;
-        private RelayCommand saveButtonPress;
+        private RelayCommand _addButtonPress;
+        private RelayCommand _expelButtonPress;
+        private RelayCommand _saveButtonPress;
+
+        private RelayCommand? _addPerformancePress;
+        private RelayCommand? _deletePerformancePress;
+        private RelayCommand? _savePerforamcePress;
 
         private bool changed;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public RelayCommand AddButtonPress => addButtonPress;
-        public RelayCommand ExpelButtonPress => expelButtonPress;
-        public RelayCommand SaveButtonPress => saveButtonPress;
+        public RelayCommand AddButtonPress => _addButtonPress;
+        public RelayCommand ExpelButtonPress => _expelButtonPress;
+        public RelayCommand SaveButtonPress => _saveButtonPress;
 
+        public RelayCommand AddPerformancePress => _addPerformancePress ??=
+            new RelayCommand(AddNewPerformance, _ => SelectedStudent != null);
 
-        private Student? selectedStudent;
+        public RelayCommand DeletePerformancePress => _deletePerformancePress ??=
+            new RelayCommand(DeleteSelectedPerformance, _ => SelectedPerformance != null);
+        public RelayCommand SavePerformancePress => _savePerforamcePress ??=
+            new RelayCommand(SavePerformance);
+
+        private Student? _selectedStudent;
         public Student? SelectedStudent
         {
-            get => selectedStudent;
+            get => _selectedStudent;
             set
             {
-                selectedStudent = value;
+                _selectedStudent = value;
                 OnPropertyChanged();
+                CommandManager.InvalidateRequerySuggested();
+                LoadPerformancesForSelectedStudentAsync();
+            }
+        }
+
+        private StudentsPerformance? _selectedPerformance;
+        public StudentsPerformance? SelectedPerformance
+        {
+            get => _selectedPerformance;
+            set
+            {
+                _selectedPerformance = value;
+                OnPropertyChanged();
+                CommandManager.InvalidateRequerySuggested();
             }
         }
 
         public MainViewModel()
         {
-            addButtonPress = new RelayCommand(AddNewStudent);
-            expelButtonPress = new RelayCommand(ExpelStudent, (p) => { return SelectedStudent != null; });
-            saveButtonPress = new RelayCommand(async (obj) => { await Save(obj); });
+            _addButtonPress = new RelayCommand(AddNewStudent);
+            _expelButtonPress = new RelayCommand(ExpelStudent, (p) => { return SelectedStudent != null; });
+            _saveButtonPress = new RelayCommand(async (obj) => { await Save(obj); });
+        }
+
+        private async void LoadPerformancesForSelectedStudentAsync()
+        {
+            Performances.Clear();
+            if (SelectedStudent?.Id > 0)
+            {
+                var perfList = await DbHelper.LoadPerformanceForStudentAsync(SelectedStudent.Id);
+                foreach (var perf in perfList)
+                {
+                    Performances.Add(perf);
+                }
+            }
         }
 
         public async Task LoadData()
@@ -67,8 +101,7 @@ namespace Students
         private void AddNewStudent(object? param)
         {
             var stud = new Student();
-            stud.GenerateId();
-            students.Add(stud);
+            _students.Add(stud);
             SelectedStudent = stud;
             changed = true;
         }
@@ -78,7 +111,7 @@ namespace Students
             if (SelectedStudent != null)
             {
                 await DbHelper.DeleteStudentInfoAsync(SelectedStudent);
-                students.Remove(SelectedStudent);
+                _students.Remove(SelectedStudent);
                 changed = true;
             }
         }
