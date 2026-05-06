@@ -103,7 +103,7 @@ namespace Students
         public static async Task SavePerformanceAsync(Performance performance)
         {
             var query = @"
-                INSERT INTO performance (student_id, subject, popints)
+                INSERT INTO performance (student_id, subject, points)
                 VALUES (@studentId, @subject, @points)
                 ON CONFLICT (student_id, subject)
                 DO UPDATE SET points = @points";
@@ -134,7 +134,7 @@ namespace Students
                     p.id as performance_id,
                     p.student_id,
                     s.lastname,
-                    s.firsname,
+                    s.firstname,
                     p.subject,
                     p.points
                 FROM performance p

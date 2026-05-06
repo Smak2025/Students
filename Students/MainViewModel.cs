@@ -37,11 +37,10 @@ namespace Students
 
         public RelayCommand AddPerformancePress => _addPerformancePress ??=
             new RelayCommand(AddNewPerformance, _ => SelectedStudent != null);
-
         public RelayCommand DeletePerformancePress => _deletePerformancePress ??=
-            new RelayCommand(DeleteSelectedPerformance, _ => SelectedPerformance != null);
+            new RelayCommand(_ => DeleteSelectedPerformanceAsync(), _ => SelectedPerformance != null);
         public RelayCommand SavePerformancePress => _savePerforamcePress ??=
-            new RelayCommand(SavePerformance);
+            new RelayCommand(async _ => await SavePerformanceAsync());
 
         private Student? _selectedStudent;
         public Student? SelectedStudent
@@ -54,6 +53,20 @@ namespace Students
                 CommandManager.InvalidateRequerySuggested();
                 LoadPerformancesForSelectedStudentAsync();
             }
+        }
+
+        private string _newSubject = string.Empty;
+        public string NewSubject
+        {
+            get => _newSubject;
+            set { _newSubject = value; OnPropertyChanged(); }
+        }
+
+        private int _newPoints;
+        public int NewPoints
+        {
+            get => _newPoints;
+            set { _newPoints = value; OnPropertyChanged(); }
         }
 
         private StudentsPerformance? _selectedPerformance;
@@ -135,6 +148,56 @@ namespace Students
                 {
                     Save(null);
                 }
+            }
+        }
+
+        private void AddNewPerformance(object? param)
+        {
+            if (SelectedStudent == null 
+                || string.IsNullOrWhiteSpace(NewSubject))
+                return;
+
+            // Добавляем в коллекцию для немедленного отображения
+            var dto = new StudentsPerformance
+            {
+                StudentId = SelectedStudent.Id,
+                LastName = SelectedStudent.LastName,
+                FirstName = SelectedStudent.FirstName,
+                Subject = NewSubject,
+                Points = NewPoints
+            };
+            Performances.Add(dto);
+
+            // Сбрасываем поля ввода
+            NewSubject = string.Empty;
+            NewPoints = 0;
+        }
+
+        private async Task SavePerformanceAsync()
+        {
+            if (SelectedStudent == null) return;
+
+            foreach (var p in Performances)
+            {
+                if (p.PerformanceId == 0 
+                        && !string.IsNullOrEmpty(p.Subject)
+                    )
+                {
+                    var perf = new Performance(
+                        p.StudentId, p.Subject, p.Points
+                    );
+                    await DbHelper.SavePerformanceAsync(perf);
+                }
+            }
+        }
+
+        private async void DeleteSelectedPerformanceAsync()
+        {
+            if (SelectedPerformance?.PerformanceId > 0)
+            {
+                await DbHelper.DeletePerformanceAsync(
+                    SelectedPerformance.PerformanceId);
+                Performances.Remove(SelectedPerformance);
             }
         }
     }

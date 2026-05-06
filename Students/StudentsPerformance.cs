@@ -17,8 +17,8 @@ namespace Students
         public string PointsColor => Points switch
         {
             >= 86 => "Green",
-            >= 71 => "Yellow",
-            >= 56 => "Orange",
+            >= 71 => "Orange",
+            >= 56 => "Red",
             _ => "Pink"
         };
     }

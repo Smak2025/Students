@@ -5,82 +5,170 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Students"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="MainWindow" Height="450" Width="1200"
 		Closing="Window_Closing"
 		Loaded="Window_Loaded"
 		>
 	<Window.Resources>
 		<Style TargetType="TextBox">
-			<Setter Property="Margin" Value="8, 4"/>
+			<Setter Property="Margin" Value="4,2"/>
+			<Setter Property="Padding" Value="2"/>
 		</Style>
 		<Style TargetType="TextBlock">
-			<Setter Property="Margin" Value="8, 4"/>
+			<Setter Property="Margin" Value="4,2"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<Style TargetType="Button">
+			<Setter Property="Margin" Value="4,2"/>
+			<Setter Property="Padding" Value="8,4"/>
 		</Style>
 	</Window.Resources>
-    <Grid>
+
+	<Grid Margin="8">
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*"/>
-			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="1*"/>
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="*"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
-		<GroupBox Grid.Row="0" Grid.Column="0" Header="Список студентов" Grid.RowSpan="8">
-			<ListView 
-				x:Name="StudentsListView" 
-				SelectionMode="Single"
-				SelectedItem="{Binding SelectedStudent}"
-				ItemsSource="{Binding Students}">
-				<ListView.View>
-					<GridView>
-						<GridViewColumn Header="Фамилия" Width="120" DisplayMemberBinding="{Binding LastName}"/>
-						<GridViewColumn Header="Имя" Width="120" DisplayMemberBinding="{Binding FirstName}"/>
-						<GridViewColumn Header="Номер группы" Width="100" DisplayMemberBinding="{Binding Group}"/>
-					</GridView>
-				</ListView.View>
-			</ListView>
+		<!-- Левая панель: список студентов -->
+		<GroupBox Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Header="Студенты" FontWeight="Bold">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+
+				<ListView x:Name="StudentsListView"
+                          ItemsSource="{Binding Students}"
+                          SelectedItem="{Binding SelectedStudent}"
+                          SelectionMode="Single">
+					<ListView.View>
+						<GridView>
+							<GridViewColumn Header="Фамилия" Width="100" DisplayMemberBinding="{Binding LastName}"/>
+							<GridViewColumn Header="Имя" Width="100" DisplayMemberBinding="{Binding FirstName}"/>
+							<GridViewColumn Header="Группа" Width="80" DisplayMemberBinding="{Binding Group}"/>
+						</GridView>
+					</ListView.View>
+				</ListView>
+
+				<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+					<Button Content="➕ Добавить" Command="{Binding AddButtonPress}"/>
+					<Button Content="❌ Отчислить" Command="{Binding ExpelButtonPress}"/>
+					<Button Content="💾 Сохранить" Command="{Binding SaveButtonPress}"/>
+				</StackPanel>
+			</Grid>
 		</GroupBox>
-		<StackPanel DataContext="{Binding SelectedStudent}" Grid.Row="0" Grid.Column="1" Orientation="Vertical">
-			<TextBlock Text="Id:"/>
-			<TextBox Text="{Binding Id}" IsReadOnly="True"/>
-		</StackPanel>
-		<StackPanel DataContext="{Binding SelectedStudent}" Grid.Row="1" Grid.Column="1" Orientation="Vertical">
-			<TextBlock Text="Фамилия:"/>
-			<TextBox Text="{Binding LastName}"/>
-		</StackPanel>
-		<StackPanel DataContext="{Binding SelectedStudent}" Grid.Row="2" Grid.Column="1" Orientation="Vertical">
-			<TextBlock Text="Имя:"/>
-			<TextBox Text="{Binding FirstName}"/>
-		</StackPanel>
-		<StackPanel DataContext="{Binding SelectedStudent}" Grid.Row="3" Grid.Column="1" Orientation="Vertical">
-			<TextBlock Text="Группа:"/>
-			<TextBox Text="{Binding Group}"/>
-		</StackPanel>
-		<StackPanel DataContext="{Binding SelectedStudent}" Grid.Row="4" Grid.Column="1" Orientation="Vertical">
-			<TextBlock Text="Дата рождения:"/>
-			<TextBox Text="{Binding Birthday}"/>
-		</StackPanel>
-		<StackPanel DataContext="{Binding SelectedStudent}" Grid.Row="5" Grid.Column="1" Orientation="Vertical">
-			<TextBlock Text="Уровень:"/>
-			<TextBox Text="{Binding Level}"/>
-		</StackPanel>
-		<StackPanel DataContext="{Binding SelectedStudent}" Grid.Row="6" Grid.Column="1" Orientation="Vertical">
-			<TextBlock Text="Специальность:"/>
-			<TextBox Text="{Binding Speciality}"/>
-		</StackPanel>
-		<StackPanel Grid.Row="7" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-			<StackPanel Orientation="Horizontal">
-				<Button Content="Принять студента" Padding="8, 4"  Command="{Binding AddButtonPress}"/>
-				<Button Content="Отчислить студента" Padding="8, 4" Command="{Binding ExpelButtonPress}"/>
-				<Button Content="Сохранить" Padding="8, 4" Command="{Binding SaveButtonPress}"/>
+
+		<!-- Центральная панель: редактирование студента -->
+		<GroupBox Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Header="Данные студента" FontWeight="Bold">
+			<StackPanel DataContext="{Binding SelectedStudent}">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="100"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+
+					<TextBlock Grid.Row="0" Grid.Column="0" Text="Id:"/>
+					<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Id}" IsReadOnly="True"/>
+
+					<TextBlock Grid.Row="1" Grid.Column="0" Text="Фамилия:"/>
+					<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding LastName}"/>
+
+					<TextBlock Grid.Row="2" Grid.Column="0" Text="Имя:"/>
+					<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding FirstName}"/>
+
+					<TextBlock Grid.Row="3" Grid.Column="0" Text="Группа:"/>
+					<TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Group}"/>
+
+					<TextBlock Grid.Row="4" Grid.Column="0" Text="Дата рождения:"/>
+					<TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Birthday, StringFormat={}{0:dd.MM.yyyy}}"/>
+
+					<TextBlock Grid.Row="5" Grid.Column="0" Text="Уровень:"/>
+					<TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Level}"/>
+
+					<TextBlock Grid.Row="6" Grid.Column="0" Text="Специальность:"/>
+					<TextBox Grid.Row="6" Grid.Column="1" Text="{Binding Speciality}"/>
+				</Grid>
 			</StackPanel>
-		</StackPanel>
+		</GroupBox>
+		<!-- Правая панель: оценки студента (исправленная версия) -->
+		<GroupBox Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" Header="Оценки" FontWeight="Bold">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+
+				<!-- Форма добавления оценки — в стиле средней панели (вертикальные пары) -->
+				<StackPanel Grid.Row="0" Orientation="Vertical" Margin="4">
+					<TextBlock Text="Добавить оценку:" FontWeight="SemiBold" Margin="4,2"/>
+
+					<TextBlock Text="Предмет:" Margin="4,2"/>
+					<TextBox Text="{Binding NewSubject, UpdateSourceTrigger=PropertyChanged}" 
+                     ToolTip="Введите название предмета"
+                     Margin="4,2"/>
+
+					<TextBlock Text="Баллы (0–100):" Margin="4,2"/>
+					<TextBox Text="{Binding NewPoints, UpdateSourceTrigger=PropertyChanged}" 
+                     ToolTip="Введите количество баллов"
+                     Margin="4,2"/>
+
+					<Button Content="➕ Добавить в список" 
+                    Command="{Binding AddPerformancePress}" 
+                    Margin="4,8,4,2"
+                    HorizontalAlignment="Left"/>
+				</StackPanel>
+
+				<!-- Список оценок -->
+				<ListView Grid.Row="1" 
+                  ItemsSource="{Binding Performances}"
+                  SelectedItem="{Binding SelectedPerformance}"
+                  SelectionMode="Single"
+                  Margin="4">
+					<ListView.View>
+						<GridView>
+							<GridViewColumn Header="Предмет" Width="140" DisplayMemberBinding="{Binding Subject}"/>
+
+							<GridViewColumn Header="Баллы" Width="70">
+								<GridViewColumn.CellTemplate>
+									<DataTemplate>
+										<TextBlock Text="{Binding Points}" 
+                                           Foreground="{Binding PointsColor}"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+									</DataTemplate>
+								</GridViewColumn.CellTemplate>
+							</GridViewColumn>
+
+							<!-- Исправленная привязка: используем вычисляемое свойство StudentName -->
+							<GridViewColumn Header="Студент" Width="130" 
+                                    DisplayMemberBinding="{Binding StudentName}"/>
+						</GridView>
+					</ListView.View>
+				</ListView>
+
+				<!-- Кнопки управления оценками -->
+				<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="4">
+					<Button Content="💾 Сохранить оценки" Command="{Binding SavePerformancePress}" Margin="4"/>
+					<Button Content="🗑️ Удалить выбранную" Command="{Binding DeletePerformancePress}" Margin="4"/>
+				</StackPanel>
+			</Grid>
+		</GroupBox>
+
 	</Grid>
 </Window>
